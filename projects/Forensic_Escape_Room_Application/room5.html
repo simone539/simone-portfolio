@@ -1,0 +1,164 @@
+<div id="timerContainer" style="position: fixed; top: 20px; right: 130px; background-color: #222; color: #fff; padding: 10px 15px; border-radius: 5px; font-family: Arial, sans-serif; z-index: 10000;">
+<span id="countdown">05:00</span>
+<button id="pauseBtn" style="margin-left: 10px; background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Pause</button>
+</div>
+<div id="timeoutMessage" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); background-color: #e74c3c; color: white; font-size: 24px; padding: 20px 30px; border-radius: 10px; z-index: 10001;">
+    ⏰ Time is up!
+</div>
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Room 5 – Image Acquisition</title>
+<style>
+/* Modals */
+#clueModal, #toolModal { position: fixed; z-index: 9500; left: 0; top: 0; width: 100%; height: 100%; display: none; background: rgba(0,0,0,0.5); }
+.modal-content { background: #fff; margin: 6% auto; padding: 20px; width: min(92%, 900px); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.modal-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.modal-header h2 { margin:0; }
+.modal-body { margin-top: 12px; }
+button.primary { padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+
+/* Layout */
+.container { max-width: 960px; margin: 0 auto; padding: 20px; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+.card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.label { font-weight: 600; margin-bottom: 6px; display:block; }
+.select, .btn, input[type="file"] { padding: 10px; border-radius: 10px; border: 1px solid #ddd; width: 100%; }
+.btn { background: #111; color: #fff; cursor: pointer; border: none; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.small { color: #666; font-size: 0.9rem; }
+.inventory { margin-top: 20px; padding: 12px; border-radius: 12px; background: #f6f7f9; }
+
+/* Smart Hint button */
+#smartHintBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  z-index: 9000;
+  cursor: pointer;
+}
+pre.tool-output { background:#0c0c0c; color:#e9e9e9; padding:12px; border-radius:10px; overflow:auto; max-height:60vh; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+/* Timer look: dark panel + red Pause button to match other rooms */
+#timerContainer {
+  position: fixed; top: 20px; right: 20px;
+  background: #111; color: #fff; padding: 10px 14px;
+  border-radius: 8px; z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 600;
+}
+#pauseBtn {
+  background: #e53935; color: #fff; border: none;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer;
+}
+#timeoutMessage {
+  display: none; position: fixed; top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.88); color: #fff;
+  font-size: 24px; padding: 20px 30px; border-radius: 10px;
+  z-index: 11000;
+}
+</style>
+<!-- Room Intro Modal -->
+<div id="roomIntroModal" style="position: fixed; z-index: 11000; top: 0; left: 0; width: 100%; height: 100%;
+     background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+<div style="background-color: #fff; padding: 30px; border-radius: 10px; width: 80%; max-width: 600px; text-align: center;">
+<h2>Room 5 – Image Acquisition</h2>
+<p>
+      You’ll practice forensically sound image acquisition. Identify the correct source device,
+      acquire a basic image, and analyze it to uncover a hidden clue (e.g., via EXIF metadata or steganography).
+      Confirm the device and follow on‑screen prompts to proceed.
+    </p>
+<button onclick="document.getElementById('roomIntroModal').style.display='none';" style="background-color: #4CAF50; color: #fff; padding: 10px 20px; border: none; 
+                   border-radius: 5px; font-size: 16px; cursor: pointer;">
+      Start
+    </button>
+</div>
+</div>
+<link href="style.css" rel="stylesheet"/><!-- Added inline background for Room 5 -->
+<style>
+  body {
+    background: url('assets/image-acquisition.jpg') no-repeat center center fixed;
+    background-size: cover;
+  }
+</style>
+</head>
+<!-- TIMER_MATCH_R1_R3 --><!-- Timer (5 minutes) -->
+<!-- Navigation -->
+<a href="main_menu.html" style="position: fixed; top: 20px; left: 20px; background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; z-index: 999;">Home</a><a href="room4.html" style="position: fixed; bottom: 20px; left: 20px; background-color: #f44336; color: white; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; z-index: 9000;">⬅ Previous Room</a>
+<a href="certificate.html" id="nextBtn" style="position: fixed; bottom: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; z-index: 9000; opacity:0.5; pointer-events:none;">Next Room ➡</a>
+<button id="smartHintBtn">💡 Hint</button>
+<div class="container">
+<div class="card">
+<h1>Room 5: Image Acquisition</h1>
+<p>You’ve discovered a suspect device (see background image). Identify the correct source device, acquire the image, and analyze it to uncover the hidden clue.</p>
+<div class="row">
+<div>
+<label class="label" for="deviceSelect">Source Device</label>
+<select class="select" id="deviceSelect">
+<option value="">-- Select a device --</option>
+<option value="mobile">Mobile Phone (Android)</option>
+<option value="dslr">DSLR Camera</option>
+<option value="usb">USB Flash Drive</option>
+</select>
+<p class="small">Hint: Consider typical devices used to capture photos with rich EXIF data.</p>
+<button class="btn" id="confirmDevice">Confirm Device</button>
+</div>
+<div>
+<label class="label">Acquire Image</label>
+<input accept="image/*" id="fileInput" type="file"/>
+<p class="small">Use the provided sample: <code>assets/room5/evidence_photo.jpg</code> or upload your own.</p>
+<div style="display:flex; gap:8px; margin-top:8px;">
+<button class="btn" id="analyzeBtn">Analyze Image</button>
+<button class="btn" id="stringsBtn" title="Simulate: strings evidence_photo.jpg | grep STEGO_CLUE">Run strings</button>
+<button class="btn" id="hexBtn" title="Simulate: hex dump (tail)">Open Hex Viewer</button>
+</div>
+</div>
+</div></div>
+</div>
+<!-- Clue Modal -->
+<div id="clueModal">
+<div class="modal-content">
+<div class="modal-header"><h2>Clue Found!</h2><button class="primary" id="closeModal">OK</button></div>
+<div class="modal-body">
+<p id="clueText">...</p>
+</div>
+</div>
+</div>
+<!-- Tool Modal -->
+<div id="toolModal">
+<div class="modal-content">
+<div class="modal-header"><h2 id="toolTitle">Tool Output</h2><button class="primary" id="closeTool">Close</button></div>
+<div class="modal-body">
+<pre class="tool-output mono" id="toolOutput"></pre>
+</div>
+</div>
+</div>
+</html>
+<script src="app.js"></script>
+
+<!-- FIRST_SEEN_TS_PATCH -->
+<script>
+(function(){
+  try{
+    if (!localStorage.getItem('firstSeenTs')){
+      var now = Date.now();
+      localStorage.setItem('firstSeenTs', String(now));
+      if (!localStorage.getItem('gameStartTs')) localStorage.setItem('gameStartTs', String(now));
+    } else if (!localStorage.getItem('gameStartTs')) {
+      localStorage.setItem('gameStartTs', localStorage.getItem('firstSeenTs'));
+    }
+  }catch(e){}
+})();
+</script>

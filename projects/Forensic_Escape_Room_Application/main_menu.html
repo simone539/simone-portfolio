@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Main Menu - Forensic Escape Room</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="style.css" rel="stylesheet"/>
+<style>
+        body {
+            background: url('assets/office-background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            margin: 0;
+        }
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+            margin: 20px auto 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        .menu-container h1 { margin-bottom: 20px; }
+        .menu-container a {
+            background-color: #4CAF50;
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+        }
+        .menu-container a:hover { background-color: #45a049; }
+        .locked { background-color: #888 !important; cursor: not-allowed !important; pointer-events: none; }
+
+        .progress-bar { width: 80%; margin: 20px auto; height: 25px; background: #ccc; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #4CAF50; text-align: center; color: white; line-height: 25px; transition: width 0.3s ease; }
+        .menu-container a span { float: right; font-weight: bold; }
+
+        /* Yellow full reset bar */
+        .reset-banner {
+            width: max-content;
+            box-sizing: border-box;
+            background: #f1c40f;
+            color: #222;
+            font-weight: bold;
+            padding: 4px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .reset-banner button {
+            background: #e67e22;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .reset-banner button:hover { filter: brightness(0.95); }
+        @media (max-width: 480px){
+            .reset-banner {width: 1%;
+ padding: 4px; }
+            .reset-banner span { display: none; }
+        }
+    
+/* Icon-only reset button styles */
+.reset-banner .icon-btn {
+  background: transparent;
+  border: none;
+  width: 100%;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.reset-banner .icon-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+/* Screen-reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reset text button style */
+.reset-banner .reset-btn {
+  background: transparent;
+  border: none;
+  color: #222;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.reset-banner .reset-btn:hover { filter: brightness(0.95); }
+
+.reset-banner .reset-btn { text-align: center; }
+</style>
+</head>
+<body><a href="main_menu.html" style="position: fixed; top: 20px; left: 20px; background: #111; color: #fff; padding: 8px 12px; border-radius: 5px; text-decoration: none; z-index: 999;">Home</a>
+<a href="index.html" style="position: fixed; top: 20px; left: 20px; background-color: #f44336; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; z-index: 999;">Back to Start</a>
+<!-- Restored yellow full reset bar --><div class="menu-container">
+<h1>Forensic Escape Room</h1>
+<a href="room1.html" id="r1link"><span id="r1">Room 1: Office Evidence</span></a>
+<a href="room2.html" id="r2link"><span id="r2">Room 2: Mobile Forensics</span></a>
+<a href="room3.html" id="r3link"><span id="r3">Room 3: Cloud Recovery</span></a>
+<a href="room4.html" id="r4link"><span id="r4">Room 4: Final Challenge</span></a>
+<a href="room5.html" id="r5link"><span id="r5">Room 5: Image Acquisition</span></a>
+</div>
+<div class="reset-banner"><button aria-label="Reset Full Game Progress" class="reset-btn" onclick="resetGameProgress()" title="Reset Full Game Progress">
+    Reset Full Game Progress
+</button></div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill">0%</div>
+</div>
+
+<script src="app.js"></script></body>
+</html>

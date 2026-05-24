@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Forensic Escape Room</title>
+<link href="style.css" rel="stylesheet"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/></head>
+<body data-room="1">
+<!-- Room Intro Modal -->
+<div id="roomIntroModal" style="position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;">
+<div style="background-color: #fff; padding: 30px; border-radius: 10px; width: 80%; max-width: 600px; text-align: center;">
+<h2>Room 1 – The Analyst’s Office (The Office Raid)</h2>
+<p>You’ve arrived at the scene of a suspected cybercrime. Your mission is to carefully inspect the office and identify digital and physical evidence. Be cautious — you must preserve only what’s relevant and discard distractions. Proper chain of custody starts here! (Search through the analyst's workspace to uncover digital evidence. Look for USB drives, emails, devices, notes and hidden folders to piece together the breach timeline).</p>
+<button onclick="document.getElementById('roomIntroModal').style.display='none'" style="margin-top: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Start</button>
+</div>
+</div>
+<div style="padding: 20px; background-color: #f2f2f2; border-bottom: 2px solid #ccc;">
+<h2 style="margin-bottom: 10px;">Room 1: The Analyst’s Office (The Office Raid)</h2>
+<p style="margin: 0;">You’ve arrived at the scene of a suspected cybercrime. Your mission is to carefully inspect the office and identify digital and physical evidence. Be cautious — you must preserve only what’s relevant and discard distractions. Proper chain of custody starts here! (Search through the analyst's workspace to uncover digital evidence. Look for USB drives, emails, devices, notes and hidden folders to piece together the breach timeline).</p>
+</div>
+<button id="smartHintBtn">💡 Hint</button>
+<style>
+#smartHintBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    z-index: 1000;
+    cursor: pointer;
+}
+@media (max-width: 768px) {
+    #smartHintBtn {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+}
+</style>
+<a href="main_menu.html" style="position: fixed; top: 20px; left: 20px; background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; z-index: 999;">Home</a>
+<div id="start-screen" style="text-align:center; margin-top:20%;"><h1>Welcome to the Forensic Escape Room</h1><button onclick="startGame()">Start Game</button></div><div id="game" style="display:none;">
+<h1>Forensic Escape Room</h1>
+<div id="score">Score: 0</div>
+<div class="room">
+<img alt="Office Room" id="office-bg" src="assets/office.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div class="room" id="room2" style="display:none;">
+<img alt="Office Room" id="room2-bg" src="assets/office-background.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div style="text-align:center; margin-top:20px;">
+<button onclick="showRoom('room1')">Previous Room</button>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<button onclick="completeRoom('room1')">✅ Complete Room1</button>
+</div>
+</div> <!-- close Room 2 -->
+<div class="room" id="room3" style="display:none;">
+<img alt="Office Room" id="room3-bg" src="assets/office.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div style="text-align:center; margin-top:20px;">
+<button onclick="showRoom('room2')">Previous Room</button>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<button onclick="completeRoom('room2')">✅ Complete Room2</button>
+</div>
+</div> <!-- close Room 3 -->
+<div class="room" id="room4" style="display:none;">
+<img alt="Office Room" id="room4-bg" src="assets/office.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div style="text-align:center; margin-top:20px;">
+<button onclick="showRoom('room3')">Previous Room</button>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<button onclick="completeRoom('room3')">✅ Complete Room3</button>
+</div>
+</div> <!-- close Room 4 -->
+<div class="hotspot" id="sticky" style="top: 40%; left: 60%;"></div>
+<div class="hotspot" id="mug" style="top: 85%; left: 20%;"></div>
+<div class="hotspot" id="folder" style="top: 20%; left: 25%;"></div>
+<div class="hotspot" id="keyboard" style="top: 60%; left: 40%;"></div>
+<div class="hotspot" id="laptop" style="top: 30%; left: 70%;"></div>
+<div class="hotspot" id="tablet" style="top: 30%; left: 25%;"></div>
+</div>
+<div class="modal hidden" id="modal">
+<div class="modal-content">
+<h2 id="clue-name"></h2>
+<p id="clue-description"></p>
+<button id="preserve-btn">✅ Preserve</button>
+<button id="discard-btn">❌ Discard</button>
+</div>
+</div>
+<div id="leaderboard">
+<ul id="leaderboard-list"></ul>
+</div>
+<div id="inventory">
+<h2>Inventory</h2>
+<ul id="inventory-list"></ul>
+</div>
+<div class="modal hidden" id="final-modal">
+<div class="modal-content">
+<h2>🎉 All clues collected!</h2>
+<p id="final-score"></p>
+</div>
+</div>
+<script src="app.js"></script>
+</div>
+<audio autoplay="" id="background-music" loop="" src="assets/background-music.mp3"></audio>
+<audio id="clue-sound" src="assets/clue-sound.mp3"></audio>
+<style>
+    #timer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #222;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        z-index: 1000;
+        font-weight: bold;
+    }
+    #hintBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 15px;
+        background-color: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        z-index: 1000;
+        cursor: pointer;
+    }
+</style>
+
+<!-- Room Navigation Button -->
+<a href="room2.html" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 999;
+">Next Room ➡</a>
+<div id="timerContainer" style="position: fixed; top: 20px; right: 130px; background-color: #222; color: #fff; padding: 10px 15px; border-radius: 5px; font-family: Arial, sans-serif; z-index: 10000;">
+<span id="countdown">05:00</span>
+<button id="pauseBtn" style="margin-left: 10px; background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Pause</button>
+</div>
+<div id="timeoutMessage" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); background-color: #e74c3c; color: white; font-size: 24px; padding: 20px 30px; border-radius: 10px; z-index: 10001;">
+    ⏰ Time is up!
+</div>
+<!-- HINT_TRACKER_PATCH_R1 -->
+<script>
+function startGame() {
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+
+    const clues = {
+        usb: {name: "USB Drive", description: "Suspicious USB under desk", isValid: true, collected: false},
+        sticky: {name: "Sticky Note", description: "Password written on sticky note", isValid: true, collected: false},
+        mug: {name: "Coffee Mug", description: "Just a coffee mug", isValid: false, collected: false},
+        folder: {name: "Folder", description: "Confidential folder on shelf", isValid: true, collected: false},
+        keyboard: {name: "Keyboard", description: "Suspicious sticky key", isValid: false, collected: false},
+        laptop: {name: "Laptop", description: "Company-issued laptop on the desk", isValid: true, collected: false},
+        tablet: {name: "Tablet", description: "Tablet device near the shelf", isValid: true, collected: false}
+    };
+    // Expose Room 1 clues globally for completion check
+    try { window._room1Clues = clues; } catch(e) {}
+
+
+    let currentClue = null;
+    let score = 0;
+
+    const modal = document.getElementById("modal");
+    const clueName = document.getElementById("clue-name");
+    const clueDesc = document.getElementById("clue-description");
+    const preserveBtn = document.getElementById("preserve-btn");
+    const discardBtn = document.getElementById("discard-btn");
+    const scoreDiv = document.getElementById("score");
+    const inventoryList = document.getElementById("inventory-list");
+
+    function showClue(id) {
+        currentClue = clues[id];
+        if (currentClue.collected) {
+            alert("You already collected this clue!");
+            return;
+        }
+        clueName.textContent = currentClue.name;
+        clueDesc.textContent = currentClue.description;
+        modal.classList.remove("hidden");
+    }
+
+    preserveBtn.onclick = () => {
+        if (!currentClue) return;
+        currentClue.collected = true;
+        if (currentClue.isValid) {
+            score += 20;
+            alert("✅ Valid clue! +20 points.");
+        } else {
+            score -= 10;
+            alert("❌ Invalid clue! -10 points.");
+        }
+        updateScore();
+        updateInventory();
+        // Check if all valid evidence is collected
+        if (typeof window.checkRoom1Completion === "function") { window.checkRoom1Completion(); }
+        modal.classList.add("hidden");
+        currentClue = null;
+    };
+
+    discardBtn.onclick = () => {
+        modal.classList.add("hidden");
+        currentClue = null;
+    };
+
+    function updateScore() {
+        scoreDiv.textContent = `Score: ${score}`;
+    }
+
+    function updateInventory() {
+        inventoryList.innerHTML = "";
+        for (const key in clues) {
+            if (clues[key].collected) {
+                const li = document.createElement("li");
+                li.textContent = clues[key].name;
+                inventoryList.appendChild(li);
+            }
+        }
+    }
+
+    document.getElementById("usb").onclick = () => showClue("usb");
+    document.getElementById("sticky").onclick = () => showClue("sticky");
+    document.getElementById("mug").onclick = () => showClue("mug");
+    document.getElementById("folder").onclick = () => showClue("folder");
+    document.getElementById("keyboard").onclick = () => showClue("keyboard");document.getElementById("laptop").onclick = () => showClue("laptop");
+    document.getElementById("tablet").onclick = () => showClue("tablet");
+    // Smart Hint Button
+    const hintBtn = document.getElementById("smartHintBtn");
+    hintBtn.onclick = () => {
+        let hintsUsed = parseInt(localStorage.getItem("hintsUsed")) || 0;
+        hintsUsed++;
+        localStorage.setItem("hintsUsed", hintsUsed);
+        const uncollected = Object.entries(clues).find(([id, clue]) => !clue.collected);
+        if (uncollected) {
+            const clueId = uncollected[0];
+            const hotspot = document.getElementById(clueId);
+            if (hotspot) {
+                hotspot.style.outline = "3px solid yellow";
+                hotspot.style.background = "rgba(255, 255, 0, 0.2)";
+                setTimeout(() => {
+                    hotspot.style.outline = "";
+                    hotspot.style.background = "transparent";
+                }, 1500);
+            }
+        } else {
+            alert("✅ All clues already collected!");
+        }
+    };
+
+}
+</script><script>
+  // Call this when a valid clue is discovered
+  function incrementClueCount() {
+    let count = parseInt(localStorage.getItem("cluesFound")) || 0;
+    localStorage.setItem("cluesFound", count + 1);
+    console.log("Clue count incremented to:", count + 1);
+  }
+
+  // Example: replace or call incrementClueCount() when real clues are found
+  // document.getElementById('clue-id').addEventListener('click', incrementClueCount);
+</script><script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    var btn = document.getElementById("smartHintBtn");
+  if (!btn) return;
+  // Increment ONLY per-room counter here (Room 1 already increments global hintsUsed)
+  btn.addEventListener("click", function(){
+    try {
+      var key = "room1_hints";
+      var n = parseInt(localStorage.getItem(key) || "0", 10);
+      localStorage.setItem(key, String(n + 1));
+    } catch(e) {}
+  }, {capture:true
+});
+});
+</script>
+<!-- FIRST_SEEN_TS_PATCH -->
+<script>
+(function(){
+  try{
+    if (!localStorage.getItem('firstSeenTs')){
+      var now = Date.now();
+      localStorage.setItem('firstSeenTs', String(now));
+      if (!localStorage.getItem('gameStartTs')) localStorage.setItem('gameStartTs', String(now));
+    } else if (!localStorage.getItem('gameStartTs')) {
+      localStorage.setItem('gameStartTs', localStorage.getItem('firstSeenTs'));
+    }
+  }catch(e){}
+})();
+</script>
+
+
+
+<!-- ROOM1 COMPLETION MODAL (updated with OK button) -->
+<div id="completionOverlay" style="position:fixed; inset:0; display:none; z-index:9998; background: rgba(0,0,0,0.45);"></div>
+<div id="completionModal" style="position:fixed; inset:0; display:none; z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#fff; padding:28px; border-radius:12px; width:92%; max-width:560px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.2);">
+    <h2 style="margin-top:0;">🎉 Room 1 Complete!</h2>
+    <p>You’ve collected all required evidence in <strong>Room 1 – The Analyst’s Office</strong>.</p>
+    <p style="margin-top:8px;">Great work, Investigator. You may now proceed to the next room.</p>
+    <div style="margin-top:18px; display:flex; justify-content:center;">
+  <button id="completionOkBtn" style="padding:10px 18px; border:none; border-radius:6px; background:#4CAF50; color:white; font-size:1em; cursor:pointer;">OK</button>
+</div>
+  </div>
+</div>
+<script>
+(function(){
+  var gameEnded = false;
+  function showCompletion(){
+    if (gameEnded) return;
+    gameEnded = true;
+    try { localStorage.setItem('room1_complete', 'true'); } catch(e) {}
+    var overlay = document.getElementById('completionOverlay');
+    var modal = document.getElementById('completionModal');
+    if (overlay && modal){
+      overlay.style.display = 'block';
+      modal.style.display = 'flex';
+      var okBtn = document.getElementById("completionOkBtn");
+      if (okBtn){
+        okBtn.onclick = function(){
+          overlay.style.display = 'none';
+          modal.style.display = 'none';
+        };
+      }
+    }
+  }
+  window.checkRoom1Completion = function(){
+    try{
+      var clues = window._room1Clues;
+      if (!clues) return;
+      var totalValid = 0, gotValid = 0;
+      for (var k in clues){
+        if (clues.hasOwnProperty(k) && clues[k] && clues[k].isValid){
+          totalValid++;
+          if (clues[k].collected) gotValid++;
+        }
+      }
+      if (totalValid > 0 && gotValid >= totalValid){
+        showCompletion();
+      }
+    }catch(e){}
+  };
+})();
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Forensic Escape Room</title>
+<link href="style.css" rel="stylesheet"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/></head>
+<body data-room="2">
+<!-- Room Intro Modal -->
+<div id="roomIntroModal" style="position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;">
+<div style="background-color: #fff; padding: 30px; border-radius: 10px; width: 80%; max-width: 600px; text-align: center;">
+<h2>Room 2: Mobile Device Extraction</h2>
+<p>This case concerns the forensic analysis of threatening video messages transmitted via MMS and WhatsApp to a former partner. In this room, your task is to identify and submit the correct digital evidence files related to the incident. Carefully review the available items and drop only the valid evidence files: 'screenshot.png', 'whatsapp.log', 'facebook.db', and 'netstat.txt'. Selecting the correct files will allow you to progress to the next stage of the investigation.</p>
+<button onclick="document.getElementById('roomIntroModal').style.display='none'" style="margin-top: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Start</button>
+</div>
+</div>
+<div style="padding: 20px; background-color: #f2f2f2; border-bottom: 2px solid #ccc;">
+<h2 style="margin-bottom: 10px;">Room 2: Mobile Device Extraction</h2>
+<p style="margin: 0;">This case concerns the forensic analysis of threatening video messages transmitted via MMS and WhatsApp to a former partner. In this room, your task is to identify and submit the correct digital evidence files related to the incident. Carefully review the available items and drop only the valid evidence files: 'screenshot.png', 'whatsapp.log', 'facebook.db', and 'netstat.txt'. Selecting the correct files will allow you to progress to the next stage of the investigation.</p>
+</div>
+<button id="smartHintBtn">💡 Hint</button>
+<style>
+#smartHintBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    z-index: 9999;
+    cursor: pointer;
+}
+</style>
+<a href="main_menu.html" style="position: fixed; top: 20px; left: 20px; background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; z-index: 999;">Home</a>
+<div id="start-screen" style="text-align:center; margin-top:20%;">
+</div><div id="game" style="display:none;">
+<h1>Forensic Escape Room</h1>
+<div id="score">Score: 0</div>
+<button id="hint-btn">💡 Hint</button>
+<div class="room">
+<img alt="Office Room" id="office-bg" src="assets/office.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div class="room" id="room2" style="display:none;">
+<img alt="Office Room" id="room2-bg" src="assets/mobile-forensics.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div style="text-align:center; margin-top:20px;">
+<button onclick="showRoom('room1')">Previous Room</button>
+<button onclick="showRoom('room3')">Next Room</button>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<button onclick="completeRoom('room1')">✅ Complete Room1</button>
+</div>
+</div> <!-- close Room 2 -->
+<div class="room" id="room3" style="display:none;">
+<img alt="Office Room" id="room3-bg" src="assets/office.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div style="text-align:center; margin-top:20px;">
+<button onclick="showRoom('room2')">Previous Room</button>
+<button onclick="showRoom('room4')">Next Room</button>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<button onclick="completeRoom('room2')">✅ Complete Room2</button>
+</div>
+</div> <!-- close Room 3 -->
+<div class="room" id="room4" style="display:none;">
+<img alt="Office Room" id="room4-bg" src="assets/office.jpg"/>
+<div class="hotspot" id="usb" style="top: 50%; left: 30%;"></div>
+<div style="text-align:center; margin-top:20px;">
+<button onclick="showRoom('room3')">Previous Room</button>
+<button onclick="showRoom('room5')">Next Room</button>
+</div>
+<div style="text-align:center; margin-top:10px;">
+<button onclick="completeRoom('room3')">✅ Complete Room3</button>
+</div>
+</div> <!-- close Room 4 -->
+<div class="hotspot" id="sticky" style="top: 40%; left: 60%;"></div>
+<div class="hotspot" id="mug" style="top: 85%; left: 20%;"></div>
+<div class="hotspot" id="folder" style="top: 20%; left: 25%;"></div>
+<div class="hotspot" id="keyboard" style="top: 60%; left: 40%;"></div>
+<div class="hotspot" id="frame" style="top: 30%; left: 70%;"></div>
+</div>
+<div class="modal hidden" id="modal">
+<div class="modal-content">
+<h2 id="clue-name"></h2>
+<p id="clue-description"></p>
+<button id="preserve-btn">✅ Preserve</button>
+<button id="discard-btn">❌ Discard</button>
+</div>
+</div>
+<div id="leaderboard">
+<h2>Leaderboard</h2>
+<ul id="leaderboard-list"></ul>
+<button id="reset-leaderboard-btn">Reset Leaderboard</button>
+<button onclick="window.location.href='room2.html'" style="margin-left: 10px;">➡️ Next Room</button>
+</div>
+<div id="inventory">
+<h2>Inventory</h2>
+<ul id="inventory-list"></ul>
+</div>
+<div class="modal hidden" id="final-modal">
+<div class="modal-content">
+<h2>🎉 All clues collected!</h2>
+<p id="final-score"></p>
+<button onclick="location.reload()">Play Again</button><button onclick="window.location.href='room2.html'" style="margin-left: 10px;">➡️ Next Room</button>
+</div>
+</div>
+<script src="app.js">
+bin.addEventListener('drop', event => {
+    event.preventDefault();
+    const id = event.dataTransfer.getData('text');
+
+    if (!dropped.includes(id)) {
+        if (validFiles.includes(id)) {
+            const draggedEl = document.getElementById(id);
+            dropped.push(id);
+            bin.appendChild(draggedEl);
+
+            switch(id) {
+        case "log_whatsapp":
+            alert("✅ whatsapp.log is valid evidence.");
+            break;
+    
+
+        case "log_netstat":
+            alert("✅ netstat.txt is valid evidence.");
+            break;
+    
+            }
+
+            if (validFiles.every(file => dropped.includes(file))) {
+                alert("🎉 All correct evidence files collected!");
+                localStorage.setItem("room2_complete", "true");
+            }
+        } else {
+            switch(id) {
+        case "log_facebook":
+            alert("❌ facebook.db is not relevant and cannot be dropped in the bin.");
+            break;
+    
+
+        case "log_screenshot":
+            alert("❌ screenshot.png is not relevant and cannot be dropped in the bin.");
+            break;
+    
+            }
+        }
+    }
+});
+
+</script>
+</div>
+<audio autoplay="" id="background-music" loop="" src="assets/background-music.mp3"></audio>
+<audio id="clue-sound" src="assets/clue-sound.mp3"></audio>
+<style>
+    .drag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 30px;
+        justify-content: center;
+    }
+    .log-item {
+        padding: 10px 15px;
+        background-color: #444;
+        color: white;
+        border: 2px dashed #888;
+        border-radius: 5px;
+        cursor: grab;
+    }
+    .evidence-bin {
+        margin-top: 40px;
+        border: 3px dashed #4CAF50;
+        padding: 40px;
+        text-align: center;
+        font-size: 1.2em;
+        color: white;
+        background-color: rgba(0,0,0,0.5);
+    }
+</style>
+<div class="drag-container">
+<div class="log-item" draggable="true" id="log_screenshot">screenshot.png</div>
+<div class="log-item" draggable="true" id="log_whatsapp">whatsapp.log</div>
+<div class="log-item" draggable="true" id="log_facebook">facebook.db</div>
+<div class="log-item" draggable="true" id="log_netstat">netstat.txt</div>
+</div>
+<div class="evidence-bin" id="evidenceBin">
+    Drop Valid Evidence Files Here
+</div>
+<style>
+    #timer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #222;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        z-index: 1000;
+        font-weight: bold;
+    }
+    #hintBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 15px;
+        background-color: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        z-index: 1000;
+        cursor: pointer;
+    }
+</style>
+<!-- Room Navigation Buttons -->
+<a href="room1.html" style="
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #f44336;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 999;
+">⬅ Previous Room</a>
+<a href="room3.html" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 999;
+">Next Room ➡</a>
+<div id="timerContainer" style="position: fixed; top: 20px; right: 130px; background-color: #222; color: #fff; padding: 10px 15px; border-radius: 5px; font-family: Arial, sans-serif; z-index: 10000;">
+<span id="countdown">05:00</span>
+<button id="pauseBtn" style="margin-left: 10px; background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Pause</button>
+</div>
+<div id="timeoutMessage" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); background-color: #e74c3c; color: white; font-size: 24px; padding: 20px 30px; border-radius: 10px; z-index: 10001;">
+    ⏰ Time is up!
+</div>
+<!-- HINT_TRACKER_PATCH_R2 -->
+<script>
+    const validFiles = ['log_whatsapp', 'log_netstat'];
+const evidenceLabels = {
+    "log_whatsapp": "whatsapp.log",
+    "log_netstat": "netstat.txt",
+    "log_facebook": "facebook.db",
+    "log_screenshot": "screenshot.png"
+};
+    let dropped = [];
+
+    document.querySelectorAll('.log-item').forEach(item => {
+        item.addEventListener('dragstart', event => {
+            event.dataTransfer.setData('text/plain', event.target.id);
+        });
+    });
+
+    const bin = document.getElementById('evidenceBin');
+    bin.addEventListener('dragover', event => event.preventDefault());
+
+    
+
+
+
+bin.addEventListener('drop', event => {
+    event.preventDefault();
+    const id = event.dataTransfer.getData('text');
+
+    if (!dropped.includes(id)) {
+        if (validFiles.includes(id)) {
+            const draggedEl = document.getElementById(id);
+            dropped.push(id);
+            bin.appendChild(draggedEl);
+
+            switch(id) {
+        case "log_whatsapp":
+            alert("✅ whatsapp.log is valid evidence.");
+            break;
+    
+
+        case "log_netstat":
+            alert("✅ netstat.txt is valid evidence.");
+            break;
+    
+            }
+
+            if (validFiles.every(file => dropped.includes(file))) {
+                alert("🎉 All correct evidence files collected!");
+                localStorage.setItem("room2_complete", "true");
+            }
+        } else {
+            switch(id) {
+        case "log_facebook":
+            alert("❌ facebook.db is not relevant and cannot be dropped in the bin.");
+            break;
+    
+
+        case "log_screenshot":
+            alert("❌ screenshot.png is not relevant and cannot be dropped in the bin.");
+            break;
+    
+            }
+        }
+    }
+});
+
+</script><script>
+  // Call this when a valid clue is discovered
+  function incrementClueCount() {
+    let count = parseInt(localStorage.getItem("cluesFound")) || 0;
+    localStorage.setItem("cluesFound", count + 1);
+    console.log("Clue count incremented to:", count + 1);
+  }
+
+  // Example: replace or call incrementClueCount() when real clues are found
+  // document.getElementById('clue-id').addEventListener('click', incrementClueCount);
+</script><script>
+  document.addEventListener("DOMContentLoaded", function() {
+
+    const hintBtn = document.getElementById("smartHintBtn");
+    hintBtn.addEventListener("click", function () {
+      alert("Check the digital traces on the mobile device and think about common app data locations.");
+});
+  });
+</script><script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    var btn = document.getElementById("smartHintBtn");
+  if (!btn) return;
+  // Increment both global and per-room counters (Room 2 didn't update them before)
+  btn.addEventListener("click", function(){
+    try {
+      var g = parseInt(localStorage.getItem("hintsUsed") || "0", 10);
+      localStorage.setItem("hintsUsed", String(g + 1));
+      var key = "room2_hints";
+      var n = parseInt(localStorage.getItem(key) || "0", 10);
+      localStorage.setItem(key, String(n + 1));
+    } catch(e) {}
+  }, {capture:true
+});
+});
+</script>
+<!-- FIRST_SEEN_TS_PATCH -->
+<script>
+(function(){
+  try{
+    if (!localStorage.getItem('firstSeenTs')){
+      var now = Date.now();
+      localStorage.setItem('firstSeenTs', String(now));
+      if (!localStorage.getItem('gameStartTs')) localStorage.setItem('gameStartTs', String(now));
+    } else if (!localStorage.getItem('gameStartTs')) {
+      localStorage.setItem('gameStartTs', localStorage.getItem('firstSeenTs'));
+    }
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>
