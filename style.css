@@ -752,3 +752,14 @@ width:145px;
 height:145px;
 }
 }
+
+.cv-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.cv-buttons .btn {
+    margin-top: 10px;
+}
